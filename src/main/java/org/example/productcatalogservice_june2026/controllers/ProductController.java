@@ -2,6 +2,7 @@ package org.example.productcatalogservice_june2026.controllers;
 
 import org.example.productcatalogservice_june2026.dtos.CategoryDto;
 import org.example.productcatalogservice_june2026.dtos.ProductDto;
+import org.example.productcatalogservice_june2026.models.Category;
 import org.example.productcatalogservice_june2026.models.Product;
 import org.example.productcatalogservice_june2026.services.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,42 @@ public class ProductController {
     }
 
 
+    @PutMapping("{id}")
+    public ResponseEntity<ProductDto> replaceProduct(@PathVariable Long id,
+                                     @RequestBody ProductDto productDto)
+    {
+        if (id <= 0) {
+            return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+        }
+
+        Product inputProduct = from(productDto);
+        Product outputProduct = productService.replaceProduct(id,inputProduct);
+
+        if (outputProduct == null) {
+           return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        ProductDto response = from(outputProduct);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+
+    private Product from(ProductDto productDto) {
+        Product product = new Product();
+        product.setId(productDto.getId());
+        product.setName(productDto.getName());
+        product.setPrice(productDto.getPrice());
+        product.setImageUrl(productDto.getImageUrl());
+        product.setDescription(productDto.getDescription());
+        if(productDto.getCategory() != null) {
+            Category category = new Category();
+            category.setName(productDto.getCategory().getName());
+            category.setId(productDto.getCategory().getId());
+            product.setCategory(category);
+        }
+        return product;
+    }
+
     private ProductDto from(Product product) {
         ProductDto productDto = new ProductDto();
         productDto.setName(product.getName());
@@ -77,3 +114,5 @@ public class ProductController {
 //1. Look for a method in Rest Template which we can use to call FakeStore Endpoint
 //2. Complete ProductDto from Product Mapper
 //3. Try adding Delete, Put API in product controller
+
+
