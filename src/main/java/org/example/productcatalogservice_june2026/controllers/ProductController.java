@@ -1,12 +1,12 @@
 package org.example.productcatalogservice_june2026.controllers;
 
-import jakarta.websocket.Endpoint;
+import org.example.productcatalogservice_june2026.dtos.CategoryDto;
 import org.example.productcatalogservice_june2026.dtos.ProductDto;
 import org.example.productcatalogservice_june2026.models.Product;
 import org.example.productcatalogservice_june2026.services.IProductService;
-import org.example.productcatalogservice_june2026.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -33,9 +33,17 @@ public class ProductController {
     }
 
     @GetMapping("{id}")
-    public ProductDto getProductById(@PathVariable("id") Long productId) {
-       Product product = productService.getProductById();
-       return from(product);
+    public ResponseEntity<ProductDto> getProductById(@PathVariable("id") Long productId) {
+        if (productId <= 0) {
+              return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+        }
+
+       Product product = productService.getProductById(productId);
+       if (product == null) {
+           return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+       }
+       ProductDto productDto = from(product);
+       return new ResponseEntity<>(productDto,HttpStatus.OK);
     }
 
 
@@ -44,10 +52,22 @@ public class ProductController {
         return productDto;
     }
 
+
     private ProductDto from(Product product) {
         ProductDto productDto = new ProductDto();
+        productDto.setName(product.getName());
         productDto.setId(product.getId());
-        productDto.setName(productDto.getName());
+        productDto.setDescription(product.getDescription());
+        productDto.setPrice(product.getPrice());
+        productDto.setImageUrl(product.getImageUrl());
+        if(product.getCategory() != null) {
+            CategoryDto categoryDto = new CategoryDto();
+            categoryDto.setDescription(product.getCategory().getDescription());
+            categoryDto.setName(product.getCategory().getName());
+            categoryDto.setId(product.getCategory().getId());
+            productDto.setCategory(categoryDto);
+        }
+
         return productDto;
     }
 
