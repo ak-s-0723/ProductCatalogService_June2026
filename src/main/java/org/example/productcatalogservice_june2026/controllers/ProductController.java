@@ -36,12 +36,14 @@ public class ProductController {
     @GetMapping("{id}")
     public ResponseEntity<ProductDto> getProductById(@PathVariable("id") Long productId) {
         if (productId <= 0) {
-              return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+              //return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+            throw new IllegalArgumentException("Please pass positive product Id");
         }
 
        Product product = productService.getProductById(productId);
        if (product == null) {
-           return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+           //return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+           throw new NullPointerException("Product not available");
        }
        ProductDto productDto = from(product);
        return new ResponseEntity<>(productDto,HttpStatus.OK);
