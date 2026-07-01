@@ -5,8 +5,10 @@ import org.example.productcatalogservice_june2026.repos.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service("sps")
 @Primary
@@ -17,21 +19,37 @@ public class StorageProductService implements IProductService {
 
     @Override
     public Product getProductById(Long id) {
-        return null;
+        Optional<Product> productOptional = productRepo.findById(id);
+        if(productOptional.isEmpty()) {
+            return null;
+        }
+        return productOptional.get();
     }
 
     @Override
     public List<Product> getAllProducts() {
-        return null;
+        return productRepo.findAll();
     }
 
     @Override
     public Product createProduct(Product product) {
-        return null;
+        Assert.notNull(product.getId(), "Please pass id in request.");
+        Optional<Product> optionalProduct =  productRepo.findById(product.getId());
+        if (optionalProduct.isPresent()) {
+            throw new RuntimeException("Product already exist with id"+product.getId());
+        }
+
+        return productRepo.save(product);
     }
 
     @Override
     public Product replaceProduct(Long id, Product input) {
-        return null;
+        Optional<Product> optionalProduct =  productRepo.findById(id);
+        if (optionalProduct.isEmpty()) {
+            throw new RuntimeException("Product with id"+id+" not available");
+        }
+
+        input.setId(id);
+        return productRepo.save(input);
     }
 }
