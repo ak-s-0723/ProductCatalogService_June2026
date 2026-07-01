@@ -18,3 +18,19 @@ public class Product extends BaseModel {
     private Category category;
     private Boolean isPrimeSaleSpecific; //This is why we need DTO
 }
+
+
+//1                1
+//product         category
+//M                 1
+//
+//M                 1
+
+
+
+
+//1                   m
+//student             teacher
+//m                    1
+//
+//m   :  m

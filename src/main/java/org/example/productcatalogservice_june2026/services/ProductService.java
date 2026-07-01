@@ -17,7 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
-@Service
+@Service("fkps")
 public class ProductService implements IProductService {
 
     @Autowired
